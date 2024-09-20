@@ -49,6 +49,36 @@
         h3 {
             margin-top: 0;
         }
+                /* Add space between Add Orders and Stock */
+#add-orders {
+    margin-bottom: 20px; /* Adds space below the Add Orders section */
+}
+
+/* Adjust stock display for mobile devices */
+@media (max-width: 768px) {
+    #stock {
+        flex-direction: column; /* Stacks stock sections vertically on smaller screens */
+    }
+
+    #stock div {
+        min-width: 100%; /* Each stock section takes full width on mobile */
+        margin-bottom: 10px; /* Adds space between each stock section */
+    }
+    
+    #order-form {
+        margin-bottom: 20px; /* Adds space between form and stock display on mobile */
+    }
+
+    /* Adjust other elements for better mobile viewing */
+    button {
+        width: 100%; /* Make buttons full width for mobile */
+        margin-bottom: 10px; /* Add space below each button */
+    }
+
+    table {
+        font-size: 12px; /* Reduce font size for table content on mobile */
+    }
+}
     </style>
 </head>
 <body>
