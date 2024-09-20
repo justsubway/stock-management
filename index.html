@@ -40,30 +40,34 @@
         }
 
         /* Adjust stock display for mobile devices */
-    @media (max-width: 768px) {
-        #stock {
-            flex-direction: column; /* Stacks stock sections vertically on smaller screens */
-        }
+        @media (max-width: 768px) {
+            #stock {
+                flex-direction: column; /* Stacks stock sections vertically on smaller screens */
+            }
 
-        #stock div {
-            min-width: 100%; /* Each stock section takes full width on mobile */
-            margin-bottom: 10px; /* Adds space between each stock section */
-        }
-    
-        #order-form {
-            margin-bottom: 20px; /* Adds space between form and stock display on mobile */
-        }
+            #stock div {
+                min-width: 100%; /* Each stock section takes full width on mobile */
+                margin-bottom: 10px; /* Adds space between each stock section */
+            }
 
-        /* Adjust other elements for better mobile viewing */
-        button {
-            width: 100%; /* Make buttons full width for mobile */
-            margin-bottom: 10px; /* Add space below each button */
+            #order-form {
+                margin-bottom: 20px; /* Adds space between form and stock display on mobile */
+            }
+
+            #addOrder {
+                margin-top: 200px;
+            }
+
+            /* Adjust other elements for better mobile viewing */
+            button {
+                width: 100%; /* Make buttons full width for mobile */
+                margin-bottom: 10px; /* Add space below each button */
+            }
+
+            table {
+                font-size: 12px; /* Reduce font size for table content on mobile */
+            }
         }
-    
-        table {
-            font-size: 12px; /* Reduce font size for table content on mobile */
-        }
-    }
     </style>
 </head>
 <body>
@@ -73,7 +77,7 @@
     <!-- Stock display will be dynamically updated here -->
 </div>
 
-<div>
+<div id="addOrder">
     <h3>Add an Order:</h3>
     <form onsubmit="submitOrder(); return false;">
         <label for="color">Color:</label>
@@ -155,84 +159,84 @@
                 </td>
                 </tr>
                 `;
-    });
-}
+        });
+    }
 
 // Function to submit a new order
-function submitOrder() {
-    let color = document.getElementById('color').value;
-    let size = document.getElementById('size').value;
-    let customerName = document.getElementById('customerName').value;
-    let status = document.getElementById('status').value;
-    let notes = document.getElementById('notes').value || "None";  // Default to "None" if no notes
+        function submitOrder() {
+            let color = document.getElementById('color').value;
+            let size = document.getElementById('size').value;
+            let customerName = document.getElementById('customerName').value;
+            let status = document.getElementById('status').value;
+            let notes = document.getElementById('notes').value || "None";  // Default to "None" if no notes
 
-    if (customerName && status) {
-        if (addOrder(color, size)) {  // Only proceed if stock is available
-            let dateAdded = new Date();  // Track when the order was added
-            orders.push({ customerName, status, color, size, notes, dateAdded });
-            updateOrderDisplay();  // Update the order display
-            saveOrders();  // Save the orders to localStorage
+            if (customerName && status) {
+                if (addOrder(color, size)) {  // Only proceed if stock is available
+                    let dateAdded = new Date();  // Track when the order was added
+                    orders.push({ customerName, status, color, size, notes, dateAdded });
+                    updateOrderDisplay();  // Update the order display
+                    saveOrders();  // Save the orders to localStorage
+                }
+            } else {
+                alert('Please enter a customer name and select a valid status.');
+            }
         }
-    } else {
-        alert('Please enter a customer name and select a valid status.');
-    }
-}
 
 // Function to remove the star manually
-function removeStar(index) {
-    let order = orders[index];
-    // Change order time to more than 24 hours ago
-    order.dateAdded = new Date(Date.now() - (25 * 60 * 60 * 1000));  // Set time to 25 hours ago
-    updateOrderDisplay();  // Refresh the display
-    saveOrders();  // Save changes
-}
-
-
-
-    // Sample stock for each color and size
-    let stock = {
-        pink: { S: 56, M: 105, L: 85, XL: 65 },
-        black: { S: 45, M: 95, L: 75, XL: 55 },
-        blue: { S: 65, M: 105, L: 55, XL: 45 }
-    };
-
-    // Load stock from localStorage if available
-    function loadStock() {
-        let savedStock = localStorage.getItem('shirtStock');
-        if (savedStock) {
-            stock = JSON.parse(savedStock);
+        function removeStar(index) {
+            let order = orders[index];
+            // Change order time to more than 24 hours ago
+            order.dateAdded = new Date(Date.now() - (25 * 60 * 60 * 1000));  // Set time to 25 hours ago
+            updateOrderDisplay();  // Refresh the display
+            saveOrders();  // Save changes
         }
-        updateStockDisplay();
-    }
 
-    // Save stock to localStorage
-    function saveStock() {
-        localStorage.setItem('shirtStock', JSON.stringify(stock));
-    }
 
-    // Update stock display dynamically
-    function updateStockDisplay() {
-        let stockDisplay = document.getElementById('stock');
-        stockDisplay.innerHTML = `
+
+        // Sample stock for each color and size
+        let stock = {
+            pink: { S: 56, M: 105, L: 85, XL: 65 },
+            black: { S: 45, M: 95, L: 75, XL: 55 },
+            blue: { S: 65, M: 105, L: 55, XL: 45 }
+        };
+
+        // Load stock from localStorage if available
+        function loadStock() {
+            let savedStock = localStorage.getItem('shirtStock');
+            if (savedStock) {
+                stock = JSON.parse(savedStock);
+            }
+            updateStockDisplay();
+        }
+
+        // Save stock to localStorage
+        function saveStock() {
+            localStorage.setItem('shirtStock', JSON.stringify(stock));
+        }
+
+        // Update stock display dynamically
+        function updateStockDisplay() {
+            let stockDisplay = document.getElementById('stock');
+            stockDisplay.innerHTML = `
                 <h3>Stock:</h3>
                 Pink Shirts: Small (${stock.pink.S}), Medium (${stock.pink.M}), Large (${stock.pink.L}), XL (${stock.pink.XL})<br>
                 Black Shirts: Small (${stock.black.S}), Medium (${stock.black.M}), Large (${stock.black.L}), XL (${stock.black.XL})<br>
                 Blue Shirts: Small (${stock.blue.S}), Medium (${stock.blue.M}), Large (${stock.blue.L}), XL (${stock.blue.XL})
             `;
-    }
-
-    // Function to add a new order and update the stock
-    function addOrder(color, size) {
-        if (stock[color] && stock[color][size] > 0) {
-            stock[color][size]--;  // Decrease stock count
-            updateStockDisplay();  // Update the stock display
-            saveStock();  // Save the updated stock to localStorage
-            return true;  // Return true indicating successful stock reduction
-        } else {
-            alert(`No stock available for ${color} shirt in size ${size}.`);  // Alert if insufficient stock
-            return false;  // Return false indicating failure
         }
-    }
+
+        // Function to add a new order and update the stock
+        function addOrder(color, size) {
+            if (stock[color] && stock[color][size] > 0) {
+                stock[color][size]--;  // Decrease stock count
+                updateStockDisplay();  // Update the stock display
+                saveStock();  // Save the updated stock to localStorage
+                return true;  // Return true indicating successful stock reduction
+            } else {
+                alert(`No stock available for ${color} shirt in size ${size}.`);  // Alert if insufficient stock
+                return false;  // Return false indicating failure
+            }
+        }
 
 
 
@@ -260,12 +264,12 @@ function removeStar(index) {
 
 
         function deleteOrder(index) {
-        if (confirm("Are you sure you want to delete this order?")) {
-            orders.splice(index, 1); // Remove order from array
-            updateOrderDisplay(); // Update the UI
-            saveOrders(); // Save updated orders to localStorage
+            if (confirm("Are you sure you want to delete this order?")) {
+                orders.splice(index, 1); // Remove order from array
+                updateOrderDisplay(); // Update the UI
+                saveOrders(); // Save updated orders to localStorage
+            }
         }
-    }
 </script>
 
 </body>
