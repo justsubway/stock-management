@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,27 +12,15 @@
             color: white;
         }
 
-    #stock {
-        display: flex;
-        flex-wrap: wrap; /* This will allow the items to flow into multiple rows if needed */
-        justify-content: space-between; /* Adds spacing between the items */
-        background-color: #333; /* Keeps the black background */
-        color: white; /* White text */
-        padding: 10px;
-        border-radius: 10px;
-        width: 100%; /* Adjusts the width to fit horizontally */
-        margin-top: 10px;
-    }
-
-    #stock div {
-        flex: 1; /* Each shirt section (pink, black, blue) takes equal space */
-        min-width: 200px; /* Adjusts the minimum width */
-        margin-right: 10px;
-    }
-
-    h4 {
-        margin-top: 10px;
-    }
+        #stock {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            border-radius: 5px;
+        }
 
         table {
             width: 100%;
@@ -49,42 +38,12 @@
         h3 {
             margin-top: 0;
         }
-                /* Add space between Add Orders and Stock */
-#add-orders {
-    margin-bottom: 20px; /* Adds space below the Add Orders section */
-}
-
-/* Adjust stock display for mobile devices */
-@media (max-width: 768px) {
-    #stock {
-        flex-direction: column; /* Stacks stock sections vertically on smaller screens */
-    }
-
-    #stock div {
-        min-width: 100%; /* Each stock section takes full width on mobile */
-        margin-bottom: 10px; /* Adds space between each stock section */
-    }
-    
-    #order-form {
-        margin-bottom: 20px; /* Adds space between form and stock display on mobile */
-    }
-
-    /* Adjust other elements for better mobile viewing */
-    button {
-        width: 100%; /* Make buttons full width for mobile */
-        margin-bottom: 10px; /* Add space below each button */
-    }
-
-    table {
-        font-size: 12px; /* Reduce font size for table content on mobile */
-    }
-}
     </style>
 </head>
 <body>
 
 <div id="stock">
-    <h3>Stock:ㅤㅤ</h3>
+    <h3>Stock:</h3>
     <!-- Stock display will be dynamically updated here -->
 </div>
 
@@ -214,7 +173,7 @@ let stock = {
 function updateStockDisplay() {
     let stockDisplay = document.getElementById('stock');
     stockDisplay.innerHTML = `
-        <h3>Stock:ㅤㅤ</h3>
+        <h3>Stock:</h3>
         ${generateStockHTML('pink', stock.pink)}
         ${generateStockHTML('black', stock.black)}
         ${generateStockHTML('blue', stock.blue)}
