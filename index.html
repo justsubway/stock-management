@@ -98,44 +98,68 @@
 <script>
     let orders = [];
 
-    function updateOrderDisplay() {
-        let orderTable = document.getElementById('orderTable');
-        orderTable.innerHTML = '<tr><th>Customer Name</th><th>Status</th><th>Color</th><th>Size</th><th>Notes</th><th>Actions</th></tr>';
-        orders.forEach((order, index) => {
-            let displayNotes = order.notes ? order.notes : "None";  // Replace undefined or empty notes with "None"
-            orderTable.innerHTML += `
-            <tr>
-                <td>${order.customerName}</td>
-                <td>${order.status}</td>
-                <td>${order.color}</td>
-                <td>${order.size}</td>
-                <td>${displayNotes}</td>
-                <td>
-                    <button onclick="deleteOrder(${index})">Delete</button>
-                </td>
-            </tr>
+// Function to display orders with a star icon for new ones
+function updateOrderDisplay() {
+    let orderTable = document.getElementById('orderTable');
+    orderTable.innerHTML = '<tr><th>Customer Name</th><th>Status</th><th>Color</th><th>Size</th><th>Notes</th><th>New?</th><th>Actions</th></tr>';
+    
+    orders.forEach((order, index) => {
+        let displayNotes = order.notes ? order.notes : "None";  // Replace undefined or empty notes with "None"
+        
+        // Calculate if 24 hours have passed since order was placed
+        let now = new Date();
+        let orderTime = new Date(order.dateAdded);
+        let timeDifference = now - orderTime; // Difference in milliseconds
+        let isNew = timeDifference < (24 * 60 * 60 * 1000); // Check if within 24 hours
+
+        // Show star if order is new
+        let starIcon = isNew ? '★' : '';
+
+        orderTable.innerHTML += `
+        <tr>
+            <td>${order.customerName}</td>
+            <td>${order.status}</td>
+            <td>${order.color}</td>
+            <td>${order.size}</td>
+            <td>${displayNotes}</td>
+            <td>${starIcon}</td>  <!-- Star column -->
+            <td>
+                <button onclick="deleteOrder(${index})">Delete</button>
+                <button onclick="removeStar(${index})">Remove Star</button>
+            </td>
+        </tr>
         `;
-        });
-    }
+    });
+}
 
+// Function to submit a new order
+function submitOrder() {
+    let color = document.getElementById('color').value;
+    let size = document.getElementById('size').value;
+    let customerName = document.getElementById('customerName').value;
+    let status = document.getElementById('status').value;
+    let notes = document.getElementById('notes').value || "None";  // Default to "None" if no notes
 
-    function submitOrder() {
-        let color = document.getElementById('color').value;
-        let size = document.getElementById('size').value;
-        let customerName = document.getElementById('customerName').value;
-        let status = document.getElementById('status').value;
-        let notes = document.getElementById('notes').value || "None";  // Default to "None" if no notes
-
-        if (customerName && status) {
-            if (addOrder(color, size)) {  // Only proceed if stock is available
-                orders.push({ customerName, status, color, size, notes });
-                updateOrderDisplay();  // Update the order display
-                saveOrders();  // Save the orders to localStorage
-            }
-        } else {
-            alert('Please enter a customer name and select a valid status.');
+    if (customerName && status) {
+        if (addOrder(color, size)) {  // Only proceed if stock is available
+            let dateAdded = new Date();  // Track when the order was added
+            orders.push({ customerName, status, color, size, notes, dateAdded });
+            updateOrderDisplay();  // Update the order display
+            saveOrders();  // Save the orders to localStorage
         }
+    } else {
+        alert('Please enter a customer name and select a valid status.');
     }
+}
+
+// Function to remove the star manually
+function removeStar(index) {
+    let order = orders[index];
+    // Change order time to more than 24 hours ago
+    order.dateAdded = new Date(Date.now() - (25 * 60 * 60 * 1000));  // Set time to 25 hours ago
+    updateOrderDisplay();  // Refresh the display
+    saveOrders();  // Save changes
+}
 
 
     // Sample stock for each color and size
