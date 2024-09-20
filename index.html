@@ -163,36 +163,84 @@ function removeStar(index) {
 
 
     // Sample stock for each color and size
-    let stock = {
-        pink: { S: 0, M: 1, L: 4, XL: 3 },
-        black: { S: 1, M: 3, L: 6, XL: 3 },
-        blue: { S: 0, M: 9, L: 6, XL: 4 }
-    };
+let stock = {
+    pink: { S: 55, M: 105, L: 85, XL: 65 },
+    black: { S: 45, M: 95, L: 75, XL: 55 },
+    blue: { S: 65, M: 105, L: 55, XL: 45 }
+};
 
-    // Load stock from localStorage if available
-    function loadStock() {
-        let savedStock = localStorage.getItem('shirtStock');
-        if (savedStock) {
-            stock = JSON.parse(savedStock);
-        }
-        updateStockDisplay();
-    }
+// Update stock display dynamically
+function updateStockDisplay() {
+    let stockDisplay = document.getElementById('stock');
+    stockDisplay.innerHTML = `
+        <h3>Stock:</h3>
+        ${generateStockHTML('pink', stock.pink)}
+        ${generateStockHTML('black', stock.black)}
+        ${generateStockHTML('blue', stock.blue)}
+    `;
+}
 
-    // Save stock to localStorage
-    function saveStock() {
-        localStorage.setItem('shirtStock', JSON.stringify(stock));
-    }
+// Helper function to generate the HTML for stock rows with edit buttons
+function generateStockHTML(color, sizes) {
+    return `
+        <div>
+            <h4>${capitalize(color)} Shirts:</h4>
+            Small: <span id="${color}-S">${sizes.S}</span> <button onclick="editStock('${color}', 'S')">Edit</button><br>
+            Medium: <span id="${color}-M">${sizes.M}</span> <button onclick="editStock('${color}', 'M')">Edit</button><br>
+            Large: <span id="${color}-L">${sizes.L}</span> <button onclick="editStock('${color}', 'L')">Edit</button><br>
+            XL: <span id="${color}-XL">${sizes.XL}</span> <button onclick="editStock('${color}', 'XL')">Edit</button><br>
+        </div>
+    `;
+}
 
-    // Update stock display dynamically
-    function updateStockDisplay() {
-        let stockDisplay = document.getElementById('stock');
-        stockDisplay.innerHTML = `
-                <h3>Stock:</h3>
-                Pink Shirts: Small (${stock.pink.S}), Medium (${stock.pink.M}), Large (${stock.pink.L}), XL (${stock.pink.XL})<br>
-                Black Shirts: Small (${stock.black.S}), Medium (${stock.black.M}), Large (${stock.black.L}), XL (${stock.black.XL})<br>
-                Blue Shirts: Small (${stock.blue.S}), Medium (${stock.blue.M}), Large (${stock.blue.L}), XL (${stock.blue.XL})
-            `;
+// Helper function to capitalize the first letter of color names
+function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+// Function to enable stock editing for a specific color and size
+function editStock(color, size) {
+    const stockSpan = document.getElementById(`${color}-${size}`);
+    const currentValue = stockSpan.innerText;
+    
+    // Replace the stock value with an input field
+    stockSpan.innerHTML = `<input type="number" id="edit-${color}-${size}" value="${currentValue}">`;
+    
+    // Change the button to "Save"
+    stockSpan.nextElementSibling.innerText = "Save";
+    stockSpan.nextElementSibling.setAttribute('onclick', `saveStock('${color}', '${size}')`);
+}
+
+// Function to save the edited stock value
+function saveStock(color, size) {
+    const newStockValue = document.getElementById(`edit-${color}-${size}`).value;
+    
+    // Update the stock object with the new value
+    stock[color][size] = parseInt(newStockValue);
+    
+    // Update the display and save the new stock to localStorage
+    updateStockDisplay();
+    saveStockToLocalStorage();
+}
+
+// Save stock to localStorage
+function saveStockToLocalStorage() {
+    localStorage.setItem('shirtStock', JSON.stringify(stock));
+}
+
+// Load stock from localStorage if available
+function loadStock() {
+    let savedStock = localStorage.getItem('shirtStock');
+    if (savedStock) {
+        stock = JSON.parse(savedStock);
     }
+    updateStockDisplay();
+}
+
+// Call loadStock when the page loads
+window.onload = function() {
+    loadStock();  // Load stock from localStorage
+};
 
     // Function to add a new order and update the stock
     function addOrder(color, size) {
