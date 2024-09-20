@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,15 +11,27 @@
             color: white;
         }
 
-        #stock {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            padding: 10px;
-            background-color: #333;
-            color: white;
-            border-radius: 5px;
-        }
+    #stock {
+        display: flex;
+        flex-wrap: wrap; /* This will allow the items to flow into multiple rows if needed */
+        justify-content: space-between; /* Adds spacing between the items */
+        background-color: #333; /* Keeps the black background */
+        color: white; /* White text */
+        padding: 10px;
+        border-radius: 10px;
+        width: 100%; /* Adjusts the width to fit horizontally */
+        margin-top: 10px;
+    }
+
+    #stock div {
+        flex: 1; /* Each shirt section (pink, black, blue) takes equal space */
+        min-width: 200px; /* Adjusts the minimum width */
+        margin-right: 10px;
+    }
+
+    h4 {
+        margin-top: 10px;
+    }
 
         table {
             width: 100%;
