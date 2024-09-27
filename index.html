@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -71,6 +70,29 @@
     </style>
 </head>
 <body>
+
+<script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyBP5b5eaHjPNLHElKFG88aDv19m6fUlqkU",
+        authDomain: "stock-cae9f.firebaseapp.com",
+        projectId: "stock-cae9f",
+        storageBucket: "stock-cae9f.appspot.com",
+        messagingSenderId: "193659121245",
+        appId: "1:193659121245:web:532e19908b5ec344d967b4"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+
+    // Initialize Firestore
+    const db = firebase.firestore();
+</script>
 
 <div id="stock">
     <h3>Stock:</h3>
@@ -173,14 +195,23 @@
             if (customerName && status) {
                 if (addOrder(color, size)) {  // Only proceed if stock is available
                     let dateAdded = new Date();  // Track when the order was added
-                    orders.push({ customerName, status, color, size, notes, dateAdded });
-                    updateOrderDisplay();  // Update the order display
-                    saveOrders();  // Save the orders to localStorage
+                    let orderData = { customerName, status, color, size, notes, dateAdded };
+
+                    // Save order to Firestore
+                    db.collection("orders").add(orderData)
+                        .then(() => {
+                            console.log("Order successfully added!");
+                            loadOrders();  // Reload orders to update the display
+                        })
+                        .catch((error) => {
+                            console.error("Error adding order: ", error);
+                        });
                 }
             } else {
                 alert('Please enter a customer name and select a valid status.');
             }
         }
+
 
 // Function to remove the star manually
         function removeStar(index) {
@@ -202,17 +233,32 @@
 
         // Load stock from localStorage if available
         function loadStock() {
-            let savedStock = localStorage.getItem('shirtStock');
-            if (savedStock) {
-                stock = JSON.parse(savedStock);
-            }
-            updateStockDisplay();
+            db.collection("stock").doc("shirtStock").get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        stock = doc.data();
+                        updateStockDisplay();
+                    } else {
+                        console.log("No stock data found");
+                        document.getElementById('stockDisplay').innerHTML = 'No stock data available';
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error loading stock: ", error);
+                });
         }
 
-        // Save stock to localStorage
+
         function saveStock() {
-            localStorage.setItem('shirtStock', JSON.stringify(stock));
+            db.collection("stock").doc("shirtStock").set(stock)
+                .then(() => {
+                    console.log("Stock successfully updated!");
+                })
+                .catch((error) => {
+                    console.error("Error updating stock: ", error);
+                });
         }
+
 
         // Update stock display dynamically
         function updateStockDisplay() {
@@ -222,7 +268,7 @@
                 Pink Shirts: Small (${stock.pink.S}), Medium (${stock.pink.M}), Large (${stock.pink.L}), XL (${stock.pink.XL})<br>
                 Black Shirts: Small (${stock.black.S}), Medium (${stock.black.M}), Large (${stock.black.L}), XL (${stock.black.XL})<br>
                 Blue Shirts: Small (${stock.blue.S}), Medium (${stock.blue.M}), Large (${stock.blue.L}), XL (${stock.blue.XL})
-            `;
+                `;
         }
 
         // Function to add a new order and update the stock
@@ -241,19 +287,32 @@
 
 
 
-        // Save orders to localStorage
         function saveOrders() {
-            localStorage.setItem('orders', JSON.stringify(orders));
+            orders.forEach(order => {
+                db.collection("orders").add(order)
+                    .then(() => {
+                        console.log("Order successfully added!");
+                    })
+                    .catch((error) => {
+                        console.error("Error adding order: ", error);
+                    });
+            });
         }
 
-// Load orders from localStorage
         function loadOrders() {
-            let savedOrders = localStorage.getItem('orders');
-            if (savedOrders) {
-                orders = JSON.parse(savedOrders);
-                updateOrderDisplay();
-            }
+            db.collection("orders").get()
+                .then((querySnapshot) => {
+                    orders = [];  // Reset orders array
+                    querySnapshot.forEach((doc) => {
+                        orders.push(doc.data());
+                    });
+                    updateOrderDisplay();  // Update the UI with the fetched orders
+                })
+                .catch((error) => {
+                    console.error("Error loading orders: ", error);
+                });
         }
+
 
 // Call loadOrders when the page loads
         window.onload = function() {
