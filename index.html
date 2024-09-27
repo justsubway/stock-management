@@ -272,17 +272,27 @@
         }
 
         // Function to add a new order and update the stock
-        function addOrder(color, size) {
-            if (stock[color] && stock[color][size] > 0) {
-                stock[color][size]--;  // Decrease stock count
-                updateStockDisplay();  // Update the stock display
-                saveStock();  // Save the updated stock to localStorage
-                return true;  // Return true indicating successful stock reduction
-            } else {
-                alert(`No stock available for ${color} shirt in size ${size}.`);  // Alert if insufficient stock
-                return false;  // Return false indicating failure
-            }
-        }
+        document.querySelector("#add-order-form").addEventListener("submit", function(event) {
+    event.preventDefault();  // Prevent the form from refreshing the page
+    addOrder();  // Call your function to add an order
+});
+
+function addOrder() {
+    let order = {
+        // Collect form data here, e.g., product name, quantity, etc.
+        product: document.querySelector("#product").value,
+        quantity: parseInt(document.querySelector("#quantity").value),
+    };
+
+    db.collection("orders").add(order)
+        .then(() => {
+            console.log("Order added!");
+            loadOrders();  // Refresh the displayed orders after adding
+        })
+        .catch((error) => {
+            console.error("Error adding order: ", error);
+        });
+}
 
 
 
